@@ -5,6 +5,7 @@ export const AppReducer = (state, action) => {
     let budget = 0;
     switch (action.type) {
         case 'ADD_EXPENSE':
+            console.log(action);
             let total_budget = 0;
             total_budget = state.expenses.reduce(
                 (previousExp, currentExp) => {
@@ -21,6 +22,7 @@ export const AppReducer = (state, action) => {
                     }
                     return currentExp
                 });
+                
                 return {
                     ...state,
                 };
@@ -30,20 +32,22 @@ export const AppReducer = (state, action) => {
                     ...state
                 }
             }
-            case 'RED_EXPENSE':
-                const red_expenses = state.expenses.map((currentExp)=> {
-                    if (currentExp.name === action.payload.name && currentExp.cost - action.payload.cost >= 0) {
-                        currentExp.cost =  currentExp.cost - action.payload.cost;
-                        budget = state.budget + action.payload.cost
-                    }
-                    return currentExp
-                })
-                action.type = "DONE";
-                return {
-                    ...state,
-                    expenses: [...red_expenses],
-                };
-            case 'DELETE_EXPENSE':
+        case 'RED_EXPENSE':
+            console.log(action);
+            const red_expenses = state.expenses.map((currentExp)=> {
+                if (currentExp.name === action.payload.name && currentExp.cost - action.payload.cost >= 0) {
+                    currentExp.cost = currentExp.cost - action.payload.cost;
+                    budget = state.budget + action.payload.cost
+                }
+                return currentExp
+            });
+            action.type = "DONE";
+            return {
+                ...state,
+                expenses: [...red_expenses],
+            };
+        case 'DELETE_EXPENSE':
+            console.log(action);
             action.type = "DONE";
             state.expenses.map((currentExp)=> {
                 if (currentExp.name === action.payload) {
@@ -58,18 +62,33 @@ export const AppReducer = (state, action) => {
                 budget
             };
         case 'SET_BUDGET':
+            console.log(action);
             action.type = "DONE";
-            state.budget = action.payload;
+
+            let total_expenses=state.expenses.reduce((total, item)=>{
+                return(total += item.cost)
+            },0);
+            //console.log(total_expenses);
+
+            if(action.payload>20000){
+                alert("You are not allowed to have more than 20000 units of money in the budget.");
+            }else if(action.payload<total_expenses){
+                alert("Hey, your budget can't be lower than your total expenses!");
+            }else{
+                state.budget = action.payload;
+            };
+            //state.budget = action.payload;
 
             return {
                 ...state,
             };
         case 'CHG_CURRENCY':
+            console.log(action);
             action.type = "DONE";
             state.currency = action.payload;
             return {
                 ...state
-            }
+            };
 
         default:
             return state;
